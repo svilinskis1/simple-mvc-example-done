@@ -35,6 +35,8 @@ const router = (app) => {
   app.post('/updateLast', controllers.updateLast);
 
   app.post('/newDog', controllers.newDog);
+
+  app.post('/searchDog', controllers.searchDog);
 };
 
 // export the router function

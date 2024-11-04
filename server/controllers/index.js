@@ -325,39 +325,29 @@ const newDog = async (req, res) => {
 };
 
 const searchDog = async(req, res) => {
-  if (!req.query.name) {
-    return res.status(400).json({ error: 'Name is required to perform a search' });
-  }
+  //if (!req.query.name) {
+  //  return res.status(400).json({ error: 'Name is required to perform a search' });
+  //}
 
   let doc;
   try {
-
-    doc = await Dog.findOne({ name: req.query.name }).exec();
+    doc = await Dog.findOneAndUpdate({ name: req.query.name }, {$inc: {'age': 1}}, {
+      returnDocument: 'after',
+    }).exec();
   } catch (err) {
+    // If there is an error, log it and send the user an error message.
     console.log(err);
     return res.status(500).json({ error: 'Something went wrong' });
   }
+
+  // If we do not find something that matches our search, doc will be empty.
   if (!doc) {
     return res.status(404).json({ error: 'No dogs found' });
   }
 
-  return res.json({ name: doc.name, beds: doc.bedsOwned });
-
-     const updatePromise = Cat.findOneAndUpdate({}, {$inc: {'bedsOwned': 1}}, {
-      returnDocument: 'after', //Populates doc in the .then() with the version after update
-      sort: {'createdDate': 'descending'}
-    }).lean().exec();
-  
-    updatePromise.then((doc) => res.json({
-      name: doc.name,
-      beds: doc.bedsOwned,
-    }));
-  
-    updatePromise.catch((err) => {
-      console.log(err);
-      return res.status(500).json({ error: 'Something went wrong' });
-    });
-}
+  // Otherwise, we got a result and will send it back to the user.
+  return res.json({ name: doc.name, breed:doc.breed, age: doc.age });
+};
 
 // export the relevant public controller functions
 module.exports = {
