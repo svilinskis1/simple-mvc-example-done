@@ -325,27 +325,25 @@ const newDog = async (req, res) => {
 };
 
 const searchDog = async(req, res) => {
-  //if (!req.query.name) {
-  //  return res.status(400).json({ error: 'Name is required to perform a search' });
-  //}
+
+  if (!req.body.name) {
+    return res.status(400).json({ error: 'Name is required to perform a search' });
+  }
 
   let doc;
   try {
-    doc = await Dog.findOneAndUpdate({ name: req.query.name }, {$inc: {'age': 1}}, {
+    doc = await Dog.findOneAndUpdate({ name: req.body.name }, {$inc: {'age': 1}}, {
       returnDocument: 'after',
     }).exec();
   } catch (err) {
-    // If there is an error, log it and send the user an error message.
     console.log(err);
     return res.status(500).json({ error: 'Something went wrong' });
   }
 
-  // If we do not find something that matches our search, doc will be empty.
   if (!doc) {
     return res.status(404).json({ error: 'No dogs found' });
   }
 
-  // Otherwise, we got a result and will send it back to the user.
   return res.json({ name: doc.name, breed:doc.breed, age: doc.age });
 };
 
